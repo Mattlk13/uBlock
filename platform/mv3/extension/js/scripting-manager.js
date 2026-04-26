@@ -372,8 +372,10 @@ function registerScriptlet(context, scriptletDetails) {
 export async function registerInjectables() {
     if ( browser.scripting === undefined ) { return false; }
 
-    if ( registerInjectables.pendingRegisterOp ) {
-        await registerInjectables.pendingRegisterOp;
+    while ( registerInjectables.pendingRegisterOp ) {
+        const promise = registerInjectables.pendingRegisterOp;
+        registerInjectables.pendingRegisterOp = undefined;
+        await promise;
     }
     const { resolve: resolveRegisterOp, promise } = Promise.withResolvers();
     registerInjectables.pendingRegisterOp = promise;
